@@ -16,7 +16,7 @@
  */
 (function () {
   if (window.__sideBear) return;
-  var SB = (window.__sideBear = { version: '1.0.0' });
+  var SB = (window.__sideBear = { version: '1.0.1' });
 
   var HEADER = 'side-bear-g-';
   var CLOSED = '-zu';

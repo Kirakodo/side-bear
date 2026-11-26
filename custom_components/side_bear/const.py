@@ -4,7 +4,7 @@ from __future__ import annotations
 
 DOMAIN = "side_bear"
 NAME = "Side-Bear"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 # Frontend
 URL_BASE = "/side_bear_static"
