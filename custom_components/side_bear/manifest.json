@@ -1,0 +1,14 @@
+{
+  "domain": "side_bear",
+  "name": "Side-Bear",
+  "codeowners": ["@Kirakodo"],
+  "config_flow": true,
+  "dependencies": ["frontend", "http", "panel_custom", "websocket_api"],
+  "documentation": "https://github.com/Kirakodo/side-bear",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/Kirakodo/side-bear/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "1.0.0"
+}

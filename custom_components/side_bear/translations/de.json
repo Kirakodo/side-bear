@@ -1,0 +1,13 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Side-Bear",
+        "description": "Seitenleiste gruppieren, auf- und zuklappen und Einträge ausblenden. Nach der Einrichtung „Side-Bear“ in der Seitenleiste öffnen."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Side-Bear ist bereits eingerichtet."
+    }
+  }
+}
