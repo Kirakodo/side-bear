@@ -31,6 +31,6 @@ Bis dahin kann jeder Side-Bear schon über **HACS → Benutzerdefinierte Reposit
 ## Neue Version herausgeben
 
 1. Version erhöhen in `custom_components/side_bear/manifest.json`, `const.py` **und** `frontend/side-bear.js`
-   (z. B. `1.0.2`). Die Version steckt auch in der Frontend-Adresse – so laden Browser die neue Datei sofort.
+   (z. B. `1.1.1`). Version und ein Fingerabdruck der JS-Datei stecken in der Frontend-Adresse – so laden Browser die neue Datei sofort.
 2. Änderungen hochladen.
-3. Neues Release mit Tag `v1.0.2` anlegen. HACS meldet das Update automatisch.
+3. Neues Release mit Tag `v1.1.1` anlegen. HACS meldet das Update automatisch.

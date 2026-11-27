@@ -3,12 +3,12 @@
 Die Integration
   * liefert das Frontend-Modul aus und lädt es in jedem Browser (add_extra_js_url),
   * speichert die Einstellungen im HA-Speicher (.storage/side_bear),
-  * legt die Einstellungsseite und je Gruppe zwei Überschriften als Panels an,
-  * stellt beim Entfernen die normale Seitenleiste aller Benutzer wieder her.
+  * legt die Einstellungsseite und je Gruppe zwei Überschriften als Panels an.
 """
 
 from __future__ import annotations
 
+import hashlib
 import logging
 from pathlib import Path
 
@@ -37,6 +37,14 @@ _LOGGER = logging.getLogger(__name__)
 STATIC_REGISTERED = f"{DOMAIN}_static_registered"
 
 
+def _file_hash(path: Path) -> str:
+    """Kurzer Fingerabdruck einer Datei (läuft im Executor)."""
+    try:
+        return hashlib.sha1(path.read_bytes()).hexdigest()[:8]
+    except OSError:
+        return "0"
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Side-Bear einrichten."""
     store: Store = Store(hass, STORAGE_VERSION, STORAGE_KEY)
@@ -44,7 +52,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not isinstance(config, dict):
         config = dict(DEFAULT_CONFIG)
 
-    js_url = f"{URL_BASE}/{JS_FILE}?v={VERSION}"
+    # Fingerabdruck der Datei in der URL: jede Änderung lädt sicher neu (kein alter Cache)
+    js_path = Path(__file__).parent / "frontend" / JS_FILE
+    js_hash = await hass.async_add_executor_job(_file_hash, js_path)
+    js_url = f"{URL_BASE}/{JS_FILE}?v={VERSION}-{js_hash}"
     hass.data[DOMAIN] = {
         "store": store,
         "config": config,
@@ -58,7 +69,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             [
                 StaticPathConfig(
                     f"{URL_BASE}/{JS_FILE}",
-                    str(Path(__file__).parent / "frontend" / JS_FILE),
+                    str(js_path),
                     False,
                 )
             ]
@@ -83,36 +94,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Side-Bear deinstallieren: Einstellungen löschen, Seitenleisten zurücksetzen."""
-    await Store(hass, STORAGE_VERSION, STORAGE_KEY).async_remove()
-    await _async_reset_sidebars(hass)
+    """Side-Bear deinstallieren: eigene Einstellungen löschen.
 
-
-async def _async_reset_sidebars(hass: HomeAssistant) -> None:
-    """Normale Seitenleiste für alle Benutzer wiederherstellen.
-
-    Side-Bear lässt die Benutzerdaten "sidebar" leer, damit jedes Gerät seine
-    eigene Reihenfolge aus dem Gerätespeicher nimmt. Nach dem Entfernen setzen
-    wir dort ausdrücklich den HA-Standard, damit alte Gerätewerte nicht greifen.
+    Die Seitenleisten der Benutzer werden hier bewusst nicht angefasst. Wer zur
+    normalen Seitenleiste zurück will, schaltet Side-Bear vorher auf "inaktiv"
+    (das setzt jedes Gerät aus der eigenen Sitzung zurück), siehe README.
     """
-    try:
-        from homeassistant.components.frontend.storage import (  # noqa: PLC0415
-            async_user_store,
-        )
-    except ImportError:
-        _LOGGER.warning(
-            "Seitenleisten konnten nicht automatisch zurückgesetzt werden; "
-            "bitte in HA unter Profil > Seitenleiste bearbeiten zurücksetzen"
-        )
-        return
-
-    for user in await hass.auth.async_get_users():
-        if user.system_generated:
-            continue
-        try:
-            user_store = await async_user_store(hass, user.id)
-            await user_store.async_set_item(
-                "sidebar", {"panelOrder": [], "hiddenPanels": []}
-            )
-        except Exception:  # noqa: BLE001
-            _LOGGER.debug("Seitenleiste von %s nicht zurückgesetzt", user.name, exc_info=True)
+    await Store(hass, STORAGE_VERSION, STORAGE_KEY).async_remove()

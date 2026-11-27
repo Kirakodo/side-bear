@@ -23,7 +23,7 @@
 ### Funktionen
 
 - **Gruppen** mit Name und Icon, frei sortierbar – für alle Seitenleisten-Einträge: Dashboards, Add-ons, Energie, Verlauf …
-- **Auf- und zuklappen** mit einem Tipp auf die Gruppen-Überschrift. Der Zustand gilt **pro Gerät**: Laptop und Handy dürfen verschieden aufgeklappt sein.
+- **Auf- und zuklappen** mit einem Tipp auf die Gruppen-Überschrift. Der Zustand gilt **pro Gerät**: Laptop und Handy dürfen verschieden aufgeklappt sein. Die Einträge einer aufgeklappten Gruppe liegen als dunkler Block unter der Überschrift.
 - **Standard je Gruppe**: startet aufgeklappt oder zugeklappt; dazu „Alle aufklappen“, „Alle zuklappen“, „Auf Standard“.
 - **Ausblenden** einzelner Einträge oder ganzer Gruppen.
 - **Bedingungen**: Eintrag oder Gruppe nur zeigen, wenn eine Entität einen bestimmten Zustand hat (z. B. `binary_sensor.lichterkette_online` ist `on`).
@@ -62,7 +62,11 @@ Ordner `custom_components/side_bear` nach `/config/custom_components/side_bear` 
 
 ### Deinstallation
 
-**Einstellungen → Geräte & Dienste → Side-Bear → ⋮ → Löschen.** Side-Bear entfernt dabei seine Einstellungsseite und die Gruppen-Überschriften, löscht seine gespeicherten Einstellungen und setzt die Seitenleiste aller Benutzer auf den HA-Standard zurück. Danach in HACS entfernen und Browser/App einmal neu laden.
+1. **Seitenleiste zurücksetzen:** in Side-Bear den Schalter auf **inaktiv** stellen und Home Assistant danach auf jedem Gerät (und mit jedem Benutzer) einmal öffnen. Jedes Gerät stellt dabei selbst die normale HA-Seitenleiste her.
+2. **Einstellungen → Geräte & Dienste → Side-Bear → ⋮ → Löschen.** Side-Bear entfernt seine Einstellungsseite und die Gruppen-Überschriften und löscht seine gespeicherten Einstellungen. Die Seitenleisten der Benutzer fasst es dabei nicht an.
+3. In HACS entfernen und Browser/App einmal neu laden.
+
+Ein Gerät vergessen? Dort im Profil **Seitenleiste bearbeiten** öffnen, Einträge wieder einblenden bzw. sortieren und speichern.
 
 ### So funktioniert es (update-sicher)
 
@@ -100,7 +104,7 @@ Home Assistant 2025.1 oder neuer.
 ### Features
 
 - **Groups** with name and icon, freely sortable – for every sidebar entry: dashboards, add-ons, energy, history …
-- **Collapse and expand** by tapping the group header. The state is stored **per device**: your laptop and your phone can differ.
+- **Collapse and expand** by tapping the group header. The state is stored **per device**: your laptop and your phone can differ. The entries of an expanded group sit in a darker block below its header.
 - **Default per group**: starts expanded or collapsed; plus "expand all", "collapse all", "reset to default".
 - **Hide** single entries or whole groups.
 - **Conditions**: show an entry or group only while an entity has a given state (e.g. `binary_sensor.fairy_lights_online` is `on`).
@@ -125,7 +129,11 @@ Copy `custom_components/side_bear` to `/config/custom_components/side_bear`, res
 
 ### Uninstall
 
-**Settings → Devices & services → Side-Bear → ⋮ → Delete.** Side-Bear removes its settings page and group headers, deletes its stored settings and resets the sidebar of all users to the HA default. Then remove it in HACS and reload browser/app once.
+1. **Reset the sidebar:** switch Side-Bear to **inactive** and then open Home Assistant once on every device (and with every user). Each device restores the normal HA sidebar itself.
+2. **Settings → Devices & services → Side-Bear → ⋮ → Delete.** Side-Bear removes its settings page and group headers and deletes its stored settings. It does not touch the users' sidebars.
+3. Remove it in HACS and reload browser/app once.
+
+Missed a device? Open **Edit sidebar** in its profile, unhide/reorder the entries and save.
 
 ### How it works (update-safe)
 

@@ -16,7 +16,7 @@
  */
 (function () {
   if (window.__sideBear) return;
-  var SB = (window.__sideBear = { version: '1.0.1' });
+  var SB = (window.__sideBear = { version: '1.1.0' });
 
   var HEADER = 'side-bear-g-';
   var CLOSED = '-zu';
@@ -261,6 +261,58 @@
   setInterval(checkPath, 250);
   window.addEventListener('location-changed', function () { setTimeout(checkPath, 0); });
   window.addEventListener('popstate', function () { setTimeout(checkPath, 0); });
+
+  /* ---------- Einträge aufgeklappter Gruppen dunkler hinterlegen ---------- */
+  var SHADE_ID = 'side-bear-shade';
+  var SHADE_BG = 'rgba(0,0,0,.28)';
+  function sidebarRoot() {
+    try {
+      var ha = document.querySelector('home-assistant');
+      var main = ha && ha.shadowRoot && ha.shadowRoot.querySelector('home-assistant-main');
+      var sb = main && main.shadowRoot && main.shadowRoot.querySelector('ha-sidebar');
+      return sb ? sb.shadowRoot : null;
+    } catch (e) { return null; }
+  }
+  // Ein Block je offener Gruppe aus ihren sichtbaren Einträgen (ohne Überschrift), Lücken (4px) per Schatten gefüllt
+  SB.shadeCss = function () {
+    if (!data || !data.enabled) return '';
+    var h = hass();
+    var hidden = {};
+    SB.compute().hiddenPanels.forEach(function (p) { hidden[p] = 1; });
+    var home = SB.home();
+    var seen = {};
+    var css = '';
+    function sel(p) { return '#sidebar-panel-' + CSS.escape(p); }
+    (data.groups || []).forEach(function (g) {
+      var ids = [];
+      (g.panels || []).forEach(function (p) {
+        if (seen[p] || p === home) return;
+        seen[p] = 1;
+        if (!hidden[p] && h && h.panels[p]) ids.push(p);
+      });
+      if (hidden[SB.groupUrl(g)] || !ids.length) return;
+      var first = ids[0], last = ids[ids.length - 1];
+      css += ids.map(sel).join(',') + '{background-color:' + SHADE_BG + ';border-radius:0;box-shadow:0 4px 0 ' + SHADE_BG + '}' +
+        sel(first) + '{border-top-left-radius:8px;border-top-right-radius:8px}' +
+        sel(last) + '{border-bottom-left-radius:8px;border-bottom-right-radius:8px;box-shadow:none}';
+    });
+    return css;
+  };
+  SB.shade = function () {
+    var root = sidebarRoot();
+    if (!root) return;
+    var css = SB.shadeCss();
+    var st = root.getElementById(SHADE_ID);
+    if (!css) { if (st) st.remove(); return; }
+    if (!st) {
+      st = document.createElement('style');
+      st.id = SHADE_ID;
+      root.appendChild(st);
+    }
+    if (st.textContent !== css) st.textContent = css;
+  };
+  SB.onChange(SB.shade);
+  setInterval(function () { SB.shade(); }, 1000);
 
   SB.navigate = function (path) {
     history.pushState(null, '', path);
